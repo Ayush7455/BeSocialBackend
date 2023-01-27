@@ -8,22 +8,20 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
 
-// router.get('/home', (req, res) => {
-//     res.send("Hello World");
-// })
+
 
 async function mailer(recieveremail, code) {
-    // console.log("Mailer function called");
+ 
 
     let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
 
-        secure: false, // true for 465, false for other ports
+        secure: false, 
         requireTLS: true,
         auth: {
-            user: process.env.NodeMailer_email, // generated ethereal user
-            pass: process.env.NodeMailer_password, // generated ethereal password
+            user: process.env.NodeMailer_email, 
+            pass: process.env.NodeMailer_password, 
         },
     });
 
@@ -109,7 +107,7 @@ router.post('/signup', async (req, res) => {
 
 
 
-// forgot password
+
 
 router.post('/verifyfp', (req, res) => {
     console.log('sent by client', req.body);
@@ -195,7 +193,7 @@ router.post('/signin', (req, res) => {
                                 }
                             }
                         )
-                    // res.status(200).json({ message: "User Logged In Successfully", savedUser });
+                  
                 }
             })
             .catch(err => {
@@ -246,7 +244,7 @@ router.post('/userdata', (req, res) => {
     })
 })
 
-// change password
+
 router.post('/changepassword', (req, res) => {
     const { oldpassword, newpassword, email } = req.body;
 
@@ -344,6 +342,74 @@ router.post('/setdescription', (req, res) => {
             }
         })
 })
+router.post('/searchuser', (req, res) => {
+    const { keyword } = req.body;
+
+    if (!keyword) {
+        return res.status(422).json({ error: "Please search a username" });
+    }
+
+    User.find({ username: { $regex: keyword, $options: 'i' } })
+        .then(user => {
+          
+            let data = [];
+            user.map(item => {
+                data.push(
+                    {
+                        _id: item._id,
+                        username: item.username,
+                        email: item.email,
+                        description: item.description,
+                        profilepic: item.profilepic
+                    }
+                )
+            })
+
+            console.log(data);
+            if (data.length == 0) {
+                return res.status(422).json({ error: "No User Found" });
+            }
+            res.status(200).send({ message: "User Found", user: data });
+
+        })
+        .catch(err => {
+            res.status(422).json({ error: "Server Error" });
+        })
+})
+
+
+
+router.post('/otheruserdata', (req, res) => {
+    const { email } = req.body;
+
+    User.findOne({ email: email })
+        .then(saveduser => {
+            if (!saveduser) {
+                return res.status(422).json({ error: "Invalid Credentials" });
+            }
+            
+
+            let data = {
+                _id: saveduser._id,
+                username: saveduser.username,
+                email: saveduser.email,
+                description: saveduser.description,
+                profilepic: saveduser.profilepic,
+                followers: saveduser.followers,
+                following: saveduser.following,
+                posts: saveduser.posts
+            }
+
+
+            res.status(200).send({
+                user: data,
+                message: "User Found"
+            })
+        })
+})
+
+
+module.exports = router;
 
 
 module.exports = router;
