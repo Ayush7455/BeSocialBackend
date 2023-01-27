@@ -8,25 +8,28 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
 
+// router.get('/home', (req, res) => {
+//     res.send("Hello World");
+// })
 
 async function mailer(recieveremail, code) {
-  
+    // console.log("Mailer function called");
 
     let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
 
-        secure: false, 
+        secure: false, // true for 465, false for other ports
         requireTLS: true,
         auth: {
-            user: process.env.NodeMailer_email, 
-            pass: process.env.NodeMailer_password, 
+            user: process.env.NodeMailer_email, // generated ethereal user
+            pass: process.env.NodeMailer_password, // generated ethereal password
         },
     });
 
 
     let info = await transporter.sendMail({
-        from: "GeekChat",
+        from: "BeSocial",
         to: `${recieveremail}`,
         subject: "Email Verification",
         text: `Your Verification Code is ${code}`,
@@ -76,6 +79,9 @@ router.post('/changeusername', (req, res) => {
     })
 })
 
+
+
+
 router.post('/signup', async (req, res) => {
     const { username, password, email } = req.body;
     if (!username || !password || !email) {
@@ -103,6 +109,7 @@ router.post('/signup', async (req, res) => {
 
 
 
+// forgot password
 
 router.post('/verifyfp', (req, res) => {
     console.log('sent by client', req.body);
@@ -188,7 +195,7 @@ router.post('/signin', (req, res) => {
                                 }
                             }
                         )
-                    
+                    // res.status(200).json({ message: "User Logged In Successfully", savedUser });
                 }
             })
             .catch(err => {
@@ -217,7 +224,7 @@ router.post('/signin', (req, res) => {
 
 router.post('/userdata', (req, res) => {
     const { authorization } = req.headers;
-   
+    //    authorization = "Bearer afasgsdgsdgdafas"
     if (!authorization) {
         return res.status(401).json({ error: "You must be logged in, token not given" });
     }
@@ -239,42 +246,7 @@ router.post('/userdata', (req, res) => {
     })
 })
 
-router.post('/changepassword', (req, res) => {
-    const { oldpassword, newpassword, email } = req.body;
-
-    if (!oldpassword || !newpassword || !email) {
-        return res.status(422).json({ error: "Please add all the fields" });
-    }
-    else {
-        User.findOne({ email: email })
-            .then(async savedUser => {
-                if (savedUser) {
-                    bcrypt.compare(oldpassword, savedUser.password)
-                        .then(doMatch => {
-                            if (doMatch) {
-                                savedUser.password = newpassword;
-                                savedUser.save()
-                                    .then(user => {
-                                        res.json({ message: "Password Changed Successfully" });
-                                    })
-                                    .catch(err => {
-                                        
-                                        return res.status(422).json({ error: "Server Error" });
-
-                                    })
-                            }
-                            else {
-                                return res.status(422).json({ error: "Invalid Credentials" });
-                            }
-                        })
-
-                }
-                else {
-                    return res.status(422).json({ error: "Invalid Credentials" });
-                }
-            })
-    }
-})
+// change password
 router.post('/changepassword', (req, res) => {
     const { oldpassword, newpassword, email } = req.body;
 
@@ -311,6 +283,9 @@ router.post('/changepassword', (req, res) => {
             })
     }
 })
+
+
+
 router.post('/setusername', (req, res) => {
     const { username, email } = req.body;
     if (!username || !email) {
@@ -345,6 +320,7 @@ router.post('/setusername', (req, res) => {
 
 
 })
+
 router.post('/setdescription', (req, res) => {
     const { description, email } = req.body;
     if (!description || !email) {
