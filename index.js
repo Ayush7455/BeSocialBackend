@@ -7,11 +7,7 @@ require('./models/User');
 require('./models/Message');
 const authRoutes = require('./routes/authRoutes');
 const uploadMediaRoutes = require('./routes/uploadMediaRoutes');
-const messageRoutes = require('./routes/messageRoutes');
-//requireToken skipped
 
-
-//.......18
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 
@@ -21,13 +17,12 @@ const httpServer = createServer();
 const io = new Server(httpServer, { /* options */ });
 
 
-//
 
 
 app.use(bodyParser.json());
 app.use(authRoutes);
 app.use(uploadMediaRoutes);
-app.use(messageRoutes);
+
 
 app.get('/', (req, res) => {
     res.send("Hello World");
