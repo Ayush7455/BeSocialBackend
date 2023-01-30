@@ -1,6 +1,5 @@
 const express = require('express');
-const port = 3000
-const port1=3001
+const port =process.env.PORT
 const app = express();
 const bodyParser = require('body-parser');
 require('./db');
@@ -36,8 +35,8 @@ io.on("connection",(socket)=>{
         io.emit("receive_message",data)
     })
 })
-httpServer.listen(port1,()=>{
-    console.log("Server is running on port - ",port1)
+httpServer.listen(port,()=>{
+    console.log("Server is running on port - ",port)
 })
 
 app.listen(port, () => {
