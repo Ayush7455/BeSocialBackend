@@ -1,5 +1,5 @@
 const express = require('express');
-const port = process.env.PORT;
+const port = process.env.PORT
 const app = express();
 const bodyParser = require('body-parser');
 require('./db');
@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
 });
 
 
-httpServer.listen(process.env.PORT);
+httpServer.listen(port);
 
 // ...
 app.listen(port, () => {
