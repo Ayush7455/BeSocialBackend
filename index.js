@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
 });
 
 
-httpServer.listen(port);
+httpServer.listen(3000);
 
 // ...
 app.listen(port, () => {
