@@ -1,5 +1,6 @@
 const express = require('express');
-const port =process.env.PORT
+const port =3000
+const port1=3001
 const app = express();
 const bodyParser = require('body-parser');
 require('./db');
@@ -40,5 +41,5 @@ httpServer.listen(port,()=>{
 })
 
 app.listen(port, () => {
-    console.log("Server is running on port " + port);
+    console.log("Server is running on port " + port1);
 })
