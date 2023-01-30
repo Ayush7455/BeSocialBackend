@@ -1,5 +1,6 @@
 const express = require('express');
 const port = 3000;
+const port1=3001
 const app = express();
 const bodyParser = require('body-parser');
 require('./db');
@@ -56,7 +57,9 @@ io.on("connection", (socket) => {
 });
 
 
-httpServer.listen(3001);
+httpServer.listen(port1,()=>{
+    console.log("SocketIo is running on port "+port1)
+});
 
 // ...
 app.listen(port, () => {
