@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const User = mongoose.model("User");
+const Posts=mongoose.model("Posts")
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const nodemailer = require("nodemailer");
@@ -31,27 +32,41 @@ router.post('/setprofilepic', (req, res) => {
         })
 })
 
-router.post('/addpost', (req, res) => {
-    const { email, post, postdescription } = req.body;
+// router.post('/addpost', (req, res) => {
+//     const { email, post, postdescription } = req.body;
 
-    User.findOne({ email: email })
-        .then((savedUser) => {
-            if (!savedUser) {
-                return res.status(422).json({ error: "Invalid Credentials" })
-            }
-            savedUser.posts.push({ post, postdescription, likes: [], comments: [] });
-            savedUser.save()
-                .then(user => {
-                    res.json({ message: "Post added successfully" })
-                })
-                .catch(err => {
-                    res.json({ error: "Error adding post" })
-                })
+//     User.findOne({ email: email })
+//         .then((savedUser) => {
+//             if (!savedUser) {
+//                 return res.status(422).json({ error: "Invalid Credentials" })
+//             }
+//             savedUser.posts.push({ post, postdescription, likes: [], comments: [] });
+//             savedUser.save()
+//                 .then(user => {
+//                     res.json({ message: "Post added successfully" })
+//                 })
+//                 .catch(err => {
+//                     res.json({ error: "Error adding post" })
+//                 })
+//         })
+//         .catch(err => {
+//             console.log(err);
+//         })
+// })
+router.post('/addpost', async (req, res) => {
+    const { username,profilepic,post,postdescription } = req.body;
+    try {
+        const newPost = new Posts({
+            username,
+            profilepic,
+            post,
+            postdescription
         })
-        .catch(err => {
-            console.log(err);
-        })
-})
-
+        await newPost.save();
+        res.send({ message: "Post added successfully" });
+    } catch (err) {
+        res.status(422).send(err.message);
+    }
+});
 
 module.exports = router;

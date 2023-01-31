@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const User = mongoose.model("User");
+const Posts=mongoose.model("Posts")
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-
-
+const { request } = require('express');
 
 
 async function mailer(recieveremail, code) {
- 
+   
 
     let transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -20,14 +20,14 @@ async function mailer(recieveremail, code) {
         secure: false, 
         requireTLS: true,
         auth: {
-            user: process.env.NodeMailer_email, 
+            user: process.env.NodeMailer_email,
             pass: process.env.NodeMailer_password, 
         },
     });
 
 
     let info = await transporter.sendMail({
-        from: "BeSocial",
+        from: "GeekChat",
         to: `${recieveremail}`,
         subject: "Email Verification",
         text: `Your Verification Code is ${code}`,
@@ -222,12 +222,12 @@ router.post('/signin', (req, res) => {
 
 router.post('/userdata', (req, res) => {
     const { authorization } = req.headers;
-    //    authorization = "Bearer afasgsdgsdgdafas"
+    
     if (!authorization) {
         return res.status(401).json({ error: "You must be logged in, token not given" });
     }
     const token = authorization.replace("Bearer ", "");
-    console.log(token);
+  
 
     jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
         if (err) {
@@ -264,7 +264,7 @@ router.post('/changepassword', (req, res) => {
                                         res.json({ message: "Password Changed Successfully" });
                                     })
                                     .catch(err => {
-                                        // console.log(err);
+                                        
                                         return res.status(422).json({ error: "Server Error" });
 
                                     })
@@ -342,6 +342,10 @@ router.post('/setdescription', (req, res) => {
             }
         })
 })
+
+
+
+
 router.post('/searchuser', (req, res) => {
     const { keyword } = req.body;
 
@@ -351,7 +355,7 @@ router.post('/searchuser', (req, res) => {
 
     User.find({ username: { $regex: keyword, $options: 'i' } })
         .then(user => {
-          
+            
             let data = [];
             user.map(item => {
                 data.push(
@@ -365,7 +369,7 @@ router.post('/searchuser', (req, res) => {
                 )
             })
 
-            console.log(data);
+            
             if (data.length == 0) {
                 return res.status(422).json({ error: "No User Found" });
             }
@@ -400,6 +404,7 @@ router.post('/otheruserdata', (req, res) => {
                 posts: saveduser.posts
             }
 
+         
 
             res.status(200).send({
                 user: data,
@@ -407,6 +412,41 @@ router.post('/otheruserdata', (req, res) => {
             })
         })
 })
+router.post('/getuserbyid', (req, res) => {
+    const {userid } = req.body;
+
+    User.findById({ _id: userid })
+        .then(saveduser => {
+            if (!saveduser) {
+                return res.status(422).json({ error: "Invalid Credentials" });
+            }
+    
+
+            let data = {
+                _id: saveduser._id,
+                username: saveduser.username,
+                email: saveduser.email,
+                description: saveduser.description,
+                profilepic: saveduser.profilepic,
+                followers: saveduser.followers,
+                following: saveduser.following,
+                posts: saveduser.posts
+            }
+
+           
+
+            res.status(200).send({
+                user: data,
+                message: "User Found"
+            })
+        })
+        .catch(
+            err => {
+                console.log('error in getuserbyid ');
+            }
+        )
+})
+
 
 router.post('/followuser', (req, res) => {
     const { followfrom, followto } = req.body;
@@ -427,7 +467,7 @@ router.post('/followuser', (req, res) => {
                     mainuser.following.push(followto);
                     mainuser.save();
                 }
-               
+                
 
 
                 User.findOne(
@@ -464,6 +504,7 @@ router.post('/followuser', (req, res) => {
 
 
 })
+
 
 router.post('/checkfollow', (req, res) => {
     const { followfrom, followto } = req.body;
@@ -548,6 +589,9 @@ router.post('/unfollowuser', (req, res) => {
             return res.status(422).json({ error: "Server Error" });
         })
 })
-
-
+router.get('/getposts', (req, res) => {
+    Posts.find()
+      .then(posts => res.json(posts))
+      .catch(err => res.status(400).json(`Error: ${err}`));
+  });
 module.exports = router;
