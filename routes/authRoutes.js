@@ -186,7 +186,7 @@ router.post('/signin', (req, res) => {
 
                                     const { _id, username, email, profilepic } = savedUser;
 
-                                    res.json({ message: "Successfully Signed In", token, user: { _id, username, email, profilepic} });
+                                    res.json({ message: "Successfully Sign In", token, user: { _id, username, email, profilepic} });
                                 }
                                 else {
                                     return res.status(422).json({ error: "Invalid Credentials" });
