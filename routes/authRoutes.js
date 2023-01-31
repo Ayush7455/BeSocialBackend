@@ -186,7 +186,7 @@ router.post('/signin', (req, res) => {
 
                                     const { _id, username, email } = savedUser;
 
-                                    res.json({ message: "Successfully Signed In", token, user: { _id, username, email } });
+                                    res.json({ message: "Successfully Signed In", token, user: { _id, username, email,profilepic} });
                                 }
                                 else {
                                     return res.status(422).json({ error: "Invalid Credentials" });
@@ -594,4 +594,11 @@ router.get('/getposts', (req, res) => {
       .then(posts => res.json(posts))
       .catch(err => res.status(400).json(`Error: ${err}`));
   });
+  router.post('/getuserposts', (req, res) => {
+    const { username } = req.body;
+    Posts.find({username:username})
+      .then(posts => res.json(posts))
+      .catch(err => res.status(400).json(`Error: ${err}`));
+  });
+
 module.exports = router;
