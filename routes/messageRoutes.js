@@ -42,7 +42,7 @@ router.post('/getmessages', async (req, res) => {
 
 
 router.post('/setusermessages', async (req, res) => {
-    const { ouruserid, fuserid, lastmessage, roomid} = req.body;
+    const {fusername, ouruserid, fuserid, lastmessage, roomid} = req.body;
     console.log("MESSAGE ID RECEIVED - ", fuserid);
     User.findOne({ _id: ouruserid })
         .then(user => {
@@ -52,7 +52,7 @@ router.post('/setusermessages', async (req, res) => {
                 }
             })
             const date = Date.now();
-            user.allmessages.push({ ouruserid , fuserid, lastmessage, roomid ,date });
+            user.allmessages.push({ fusername,ouruserid , fuserid, lastmessage, roomid ,date });
             user.save()
             res.status(200).send({ message: "Message saved successfully" });
         })
@@ -64,9 +64,8 @@ router.post('/setusermessages', async (req, res) => {
 
 
 router.post('/getusermessages', async (req, res) => {
-    const { userid } = req.body;
-    console.log("USER ID RECEIVED - ", userid);
-    User.findOne({ _id: userid })
+    const {userid} = req.body;
+    User.findOne({_id:userid})
         .then(user => {
             res.status(200).send(user.allmessages);
         })
